@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scholarship Calculator - Pradeep's Academy</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      color: #fff;
+      background: linear-gradient(-45deg, #1e3c72, #2a5298, #0f2027, #203a43, #2c5364);
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+
+
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      width: 90%;
+      max-width: 500px;
+      animation: fadeInUp 1s ease;
+    }
+
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(50px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+    }
+
+
+    img.logo {
+      width: 150px;
+      margin-bottom: 20px;
+      animation: pulse 3s infinite;
+    }
+
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+
+    input {
+      width: 80%;
+      padding: 10px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+
+    button {
+      margin-top: 15px;
+      padding: 12px 20px;
+      background: #ff6f61;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+
+    button:hover {
+      background: #ff3b2e;
+      transform: scale(1.05);
+    }
+
+
+    .result-box {
+      margin-top: 20px;
+      padding: 20px;
+      background: rgba(0,0,0,0.4);
+      border-radius: 12px;
+      font-size: 1.1rem;
+      animation: zoomIn 0.8s ease;
+    }
+
+
+    @keyframes zoomIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <img src="logo.png" alt="Pradeep's Academy" class="logo">
+  <div class="container">
+    <h1>Scholarship Calculator</h1>
+    <p>Enter marks for each subject (out of 100):</p>
+    <form id="marksForm">
+      <input type="number" id="maths" placeholder="Maths" required><br>
+      <input type="number" id="science" placeholder="Science" required><br>
+      <input type="number" id="social" placeholder="Social Science" required><br>
+      <input type="number" id="english" placeholder="English" required><br>
+      <input type="number" id="hindi" placeholder="Hindi/Other" required><br>
+      <button type="button" onclick="calculate()">Calculate</button>
+      <button type="button" onclick="downloadPDF()">Download PDF</button>
+    </form>
+    <div class="result-box" id="result"></div>
+  </div>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    function calculate() {
+      let maths = parseInt(document.getElementById("maths").value) || 0;
+      let science = parseInt(document.getElementById("science").value) || 0;
+      let social = parseInt(document.getElementById("social").value) || 0;
+      let english = parseInt(document.getElementById("english").value) || 0;
+      let hindi = parseInt(document.getElementById("hindi").value) || 0;
+
+
+      let total = maths + science + social + english + hindi;
+      let percent = (total / 500) * 100;
+
+
+      let baseFees = 120000;
+      let discount = 0;
+
+
+      if (percent >= 95) {
+        discount = 0.15 * baseFees;
+      } else if (percent >= 90) {
+        discount = 0.10 * baseFees;
+      }
+
+
+      let finalFees = baseFees - discount;
+
+
+      document.getElementById("result").innerHTML = `
+        <b>Percentage:</b> ${percent.toFixed(2)}% <br>
+        <b>Scholarship:</b> ${discount > 0 ? (discount / baseFees * 100) + "%" : "No Scholarship"} <br>
+        <b>Final Fees:</b> ₹${finalFees.toLocaleString()}
+      `;
+    }
+
+
+    async function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+
+      doc.setFillColor(30, 60, 114);
+      doc.rect(0, 0, 210, 297, "F");
+
+
+      let logo = new Image();
+      logo.src = "logo.png";
+
+
+      logo.onload = function() {
+        doc.addImage(logo, "PNG", 70, 10, 70, 40);
+
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(18);
+        doc.setTextColor(255, 255, 255);
+        doc.text("Scholarship Result - Pradeep's Academy", 20, 70);
+
+
+        let resultText = document.getElementById("result").innerText;
+        doc.setFontSize(14);
+        doc.setTextColor(240, 240, 240);
+        doc.text(resultText, 20, 100);
+
+
+        doc.save("Scholarship_Result.pdf");
+      };
+    }
+  </script>
+</body>
+</html>
